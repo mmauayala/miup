@@ -1,0 +1,31 @@
+server:
+  port: 9191
+  
+spring:
+  application:
+    name: api-gateway
+  config:
+    import: optional:configserver:http://localhost:8888
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: false
+      routes:
+        - id: usuario-service
+          uri: lb://usuario-service
+          predicates:
+            - Path=/**
+        - id: product-service
+          uri: lb://product-service
+          predicates:
+            - Path=/**
+          
+
+## CONFIGURACION EUREKA SERVICE --------------
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    hostname: localhost
