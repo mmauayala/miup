@@ -4,12 +4,12 @@ import java.util.Optional;
 
 import org.springframework.data.repository.CrudRepository;
 
-import com.usuario.service.usuario_service.entities.User;
+import com.usuario.service.usuario_service.model.user.entities.UserEntity;
 
-public interface UserRepository extends CrudRepository<User, Long> {
+public interface UserRepository extends CrudRepository<UserEntity, String> {
 
-    boolean existsByUsername(String username);
- 
-    Optional<User> findByUsername(String username);
+    boolean existsUserEntityByUsername(final String username);
+
+    Optional<UserEntity> findByUsername(final String username);
 
 }

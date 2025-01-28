@@ -1,103 +1,110 @@
 package com.miup.sg.productos.product_service.controllers;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.miup.sg.productos.product_service.entities.Product;
-import com.miup.sg.productos.product_service.services.ProductService;
-
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.hibernate.validator.constraints.UUID;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import com.miup.sg.productos.product_service.models.common.CustomPage;
+import com.miup.sg.productos.product_service.models.common.dto.response.CustomPagingResponse;
+import com.miup.sg.productos.product_service.models.common.dto.response.CustomResponse;
+import com.miup.sg.productos.product_service.models.productos.Product;
+import com.miup.sg.productos.product_service.models.productos.dto.request.ProductCreateRequest;
+import com.miup.sg.productos.product_service.models.productos.dto.request.ProductPagingRequest;
+import com.miup.sg.productos.product_service.models.productos.dto.request.ProductUpdateRequest;
+import com.miup.sg.productos.product_service.models.productos.dto.response.ProductResponse;
+import com.miup.sg.productos.product_service.models.productos.mapper.CustomPageToCustomPagingResponseMapper;
+import com.miup.sg.productos.product_service.models.productos.mapper.ProductToProductResponseMapper;
+import com.miup.sg.productos.product_service.services.ProductCreateService;
+import com.miup.sg.productos.product_service.services.ProductDeleteService;
+import com.miup.sg.productos.product_service.services.ProductReadService;
+import com.miup.sg.productos.product_service.services.ProductUpdateService;
 
-
+/**
+ * REST controller named {@link ProductController} for managing products.
+ * Provides endpoints to create, read, update, and delete products.
+ */
 @RestController
 @RequestMapping("/v1/productos")
+@RequiredArgsConstructor
+@Validated
 public class ProductController {
 
     @Autowired
-    private ProductService service;
-
-    @GetMapping("/lista")
-    public List<Product> list() {
-        return service.findAll();
-    }
+    private ProductCreateService productCreateService;
     
-    @GetMapping("/{id}")
-    public ResponseEntity<?> findById(@RequestParam Long id) {
-        
-        Optional<Product> productOptional = service.findById(id);
-        if (productOptional.isPresent()) {
-            return ResponseEntity.ok(productOptional.orElseThrow());
-        }
-        return ResponseEntity.notFound().build();
+    @Autowired
+    private ProductReadService productReadService;
+    
+    @Autowired
+    private ProductUpdateService productUpdateService;
+    
+    @Autowired
+    private ProductDeleteService productDeleteService;
 
-    }
+    private final ProductToProductResponseMapper productToProductResponseMapper = ProductToProductResponseMapper.initialize();
+
+    private final CustomPageToCustomPagingResponseMapper customPageToCustomPagingResponseMapper =
+            CustomPageToCustomPagingResponseMapper.initialize();
 
     @PostMapping
-    public ResponseEntity<?> create (@Valid @RequestBody Product product, BindingResult result){
-        
-        if (result.hasFieldErrors()) {
-            return validation(result);
-        }
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    public CustomResponse<String> createProduct(@RequestBody @Valid final ProductCreateRequest productCreateRequest) {
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.save(product)); 
-    
-    }
-    
-    @PutMapping("/{id}")
-    public ResponseEntity<?> update ( @Valid @RequestBody Product product, BindingResult result, @PathVariable Long id) {
-        
-        if (result.hasFieldErrors()) {  
-            return validation(result);
-        }
-        Optional<Product> productOptional = service.update(id, product);
-        if (productOptional.isPresent()) {
+        final Product createdProduct = productCreateService
+                .createProduct(productCreateRequest);
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(productOptional.orElseThrow()); 
-    
-        }
-        return ResponseEntity.notFound().build();
-        
+        return CustomResponse.successOf(createdProduct.getId());
     }
 
+    @GetMapping("/{productId}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
+    public CustomResponse<ProductResponse> getProductById(@PathVariable @UUID final String productId) {
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete (@PathVariable Long id){
+        final Product product = productReadService.getProductById(productId);
 
-        Optional<Product> productOptional = service.delete(id);
+        final ProductResponse productResponse = productToProductResponseMapper.map(product);
 
-        if (productOptional.isPresent()) {
-            return ResponseEntity.ok(productOptional.orElseThrow());
-        }
-        return ResponseEntity.notFound().build();
+        return CustomResponse.successOf(productResponse);
 
     }
 
-    private ResponseEntity<?> validation(BindingResult result) {
+    @GetMapping
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
+    public CustomResponse<CustomPagingResponse<ProductResponse>> getProducts(
+            @RequestBody @Valid final ProductPagingRequest productPagingRequest) {
 
-        Map<String, String> errors = new HashMap<>();
+        final CustomPage<Product> productPage = productReadService.getProducts(productPagingRequest);
 
-        result.getFieldErrors().forEach(error -> {
-            errors.put(error.getField(), "El campo " + error.getField() + " " + error.getDefaultMessage());
-        });
-        return ResponseEntity.badRequest().body(errors);
-        
+        final CustomPagingResponse<ProductResponse> productPagingResponse =
+                customPageToCustomPagingResponseMapper.toPagingResponse(productPage);
+
+        return CustomResponse.successOf(productPagingResponse);
 
     }
+
+    @PutMapping("/{productId}")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    public CustomResponse<ProductResponse> updatedProductById(
+            @RequestBody @Valid final ProductUpdateRequest productUpdateRequest,
+            @PathVariable @UUID final String productId) {
+
+        final Product updatedProduct = productUpdateService.updateProductById(productId, productUpdateRequest);
+
+        final ProductResponse productResponse = productToProductResponseMapper.map(updatedProduct);
+
+        return CustomResponse.successOf(productResponse);
+    }
+
+    @DeleteMapping("/{productId}")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    public CustomResponse<Void> deleteProductById(@PathVariable @UUID final String productId) {
+
+        productDeleteService.deleteProductById(productId);
+        return CustomResponse.SUCCESS;
+    }
+
 }

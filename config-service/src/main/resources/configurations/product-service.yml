@@ -6,7 +6,7 @@ spring:
     name: product-service
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/miup_db
+    url: jdbc:mysql://localhost:3306/miup_bd
     username: root
     password: Frank800
 
