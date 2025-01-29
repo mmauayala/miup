@@ -42,7 +42,6 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
         return (exchange, chain) -> {
             String path = exchange.getRequest().getURI().getPath();
 
-            // Skip filtering for public endpoints
             if (config != null && config.getPublicEndpoints().stream().anyMatch(path::startsWith)) {
                 return chain.filter(exchange);
             }

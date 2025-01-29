@@ -6,7 +6,7 @@ import com.miup.sg.productos.product_service.models.productos.dto.request.Produc
 
 public interface ProductUpdateService {
 
-    Product updateProductById(final String productId, final ProductUpdateRequest productUpdateRequest);
+    Product updateProductById(final String id, final ProductUpdateRequest productUpdateRequest);
 
 }
 

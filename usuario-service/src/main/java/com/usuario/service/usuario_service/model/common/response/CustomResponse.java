@@ -12,14 +12,14 @@ import java.time.LocalDateTime;
 public class CustomResponse<T> {
 
     @Builder.Default
-    private LocalDateTime time = LocalDateTime.now();
+    private final LocalDateTime time = LocalDateTime.now();
 
-    private HttpStatus httpStatus;
+    private final HttpStatus httpStatus;
 
-    private Boolean isSuccess;
+    private final Boolean isSuccess;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private T response;
+    private final T response;
 
     public static final CustomResponse<Void> SUCCESS = CustomResponse.<Void>builder()
             .httpStatus(HttpStatus.OK)

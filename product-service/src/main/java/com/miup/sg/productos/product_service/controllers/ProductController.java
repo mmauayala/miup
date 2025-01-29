@@ -2,31 +2,26 @@ package com.miup.sg.productos.product_service.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
 import org.hibernate.validator.constraints.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import com.miup.sg.productos.product_service.models.common.CustomPage;
-import com.miup.sg.productos.product_service.models.common.dto.response.CustomPagingResponse;
 import com.miup.sg.productos.product_service.models.common.dto.response.CustomResponse;
 import com.miup.sg.productos.product_service.models.productos.Product;
 import com.miup.sg.productos.product_service.models.productos.dto.request.ProductCreateRequest;
-import com.miup.sg.productos.product_service.models.productos.dto.request.ProductPagingRequest;
 import com.miup.sg.productos.product_service.models.productos.dto.request.ProductUpdateRequest;
 import com.miup.sg.productos.product_service.models.productos.dto.response.ProductResponse;
-import com.miup.sg.productos.product_service.models.productos.mapper.CustomPageToCustomPagingResponseMapper;
 import com.miup.sg.productos.product_service.models.productos.mapper.ProductToProductResponseMapper;
 import com.miup.sg.productos.product_service.services.ProductCreateService;
 import com.miup.sg.productos.product_service.services.ProductDeleteService;
 import com.miup.sg.productos.product_service.services.ProductReadService;
 import com.miup.sg.productos.product_service.services.ProductUpdateService;
 
-/**
- * REST controller named {@link ProductController} for managing products.
- * Provides endpoints to create, read, update, and delete products.
- */
 @RestController
 @RequestMapping("/v1/productos")
 @RequiredArgsConstructor
@@ -47,10 +42,8 @@ public class ProductController {
 
     private final ProductToProductResponseMapper productToProductResponseMapper = ProductToProductResponseMapper.initialize();
 
-    private final CustomPageToCustomPagingResponseMapper customPageToCustomPagingResponseMapper =
-            CustomPageToCustomPagingResponseMapper.initialize();
 
-    @PostMapping
+    @PostMapping("/create")
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     public CustomResponse<String> createProduct(@RequestBody @Valid final ProductCreateRequest productCreateRequest) {
 
@@ -58,6 +51,12 @@ public class ProductController {
                 .createProduct(productCreateRequest);
 
         return CustomResponse.successOf(createdProduct.getId());
+    }
+
+    @GetMapping("/lista")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
+    public Page<Product> findAll(Pageable pageable){
+        return productReadService.findAll(pageable);
     }
 
     @GetMapping("/{productId}")
@@ -69,20 +68,6 @@ public class ProductController {
         final ProductResponse productResponse = productToProductResponseMapper.map(product);
 
         return CustomResponse.successOf(productResponse);
-
-    }
-
-    @GetMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-    public CustomResponse<CustomPagingResponse<ProductResponse>> getProducts(
-            @RequestBody @Valid final ProductPagingRequest productPagingRequest) {
-
-        final CustomPage<Product> productPage = productReadService.getProducts(productPagingRequest);
-
-        final CustomPagingResponse<ProductResponse> productPagingResponse =
-                customPageToCustomPagingResponseMapper.toPagingResponse(productPage);
-
-        return CustomResponse.successOf(productPagingResponse);
 
     }
 

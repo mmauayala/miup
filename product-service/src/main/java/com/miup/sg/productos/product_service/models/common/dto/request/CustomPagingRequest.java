@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -17,7 +16,6 @@ import com.miup.sg.productos.product_service.models.common.CustomPaging;
 @NoArgsConstructor
 public class CustomPagingRequest {
 
-    @Autowired
     private CustomPaging pagination;
 
     public Pageable toPageable() {

@@ -18,6 +18,7 @@ spring:
     show-sql: true
 
 eureka:
+  enabled: true
   instance: 
     hostname: localhost
   client: 
