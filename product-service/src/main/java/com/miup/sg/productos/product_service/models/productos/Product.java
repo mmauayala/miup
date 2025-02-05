@@ -3,7 +3,6 @@ package com.miup.sg.productos.product_service.models.productos;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-
 import com.miup.sg.productos.product_service.models.common.BaseDomainModel;
 
 @Getter
