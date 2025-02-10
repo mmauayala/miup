@@ -17,13 +17,6 @@
 		<module>eureka-service</module>
 		<module>product-service</module>
 		<module>config-service</module>
-		<module>venta-service</module>
-		<module>local-service</module>
-		<module>desperdicio-service</module>
-		<module>stock-service</module>
-		<module>ingreso-service</module>
-		<module>precio-venta-service</module>
-		<module>precio-compra-service</module>
 		<module>usuario-service</module>
 		<module>auth-service</module>
 	</modules>

@@ -21,12 +21,12 @@ public class ProductMovimientoServiceImpl implements ProductMovimientoService {
     @Autowired
     private StockRepository stockRepository;
     
-    public MovimientoStock registrarMovimientoStock(StockEntity stock, Double cantidad, Double precio, String tipo) {
+    public MovimientoStock registrarMovimientoStock(StockEntity stock, Double cantidad, String tipo) {
 
     MovimientoStock movimiento = new MovimientoStock();
     movimiento.setStock(stock); // Vincular el movimiento con el stock
     movimiento.setCantidad(cantidad);
-    movimiento.setPrecio(precio);
+    movimiento.setTipo(tipo);
     movimiento.setFecha(LocalDateTime.now());
 
     return movimientoStockRepository.save(movimiento);

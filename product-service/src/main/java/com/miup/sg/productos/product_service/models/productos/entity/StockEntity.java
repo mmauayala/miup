@@ -3,6 +3,8 @@ package com.miup.sg.productos.product_service.models.productos.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -21,7 +23,7 @@ public class StockEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "producto_id", nullable = false)
     private ProductEntity producto;
 
@@ -33,6 +35,10 @@ public class StockEntity {
     @JoinColumn(name = "precio_ingreso", nullable = false)
     private Double precioIngreso;
 
+    @JoinColumn(name = "precio_venta", nullable = false)
+    private Double precioVenta;
+
+    @JsonIgnore
     @OneToMany(mappedBy = "stock", cascade = CascadeType.PERSIST)
     private List<MovimientoStock> movimientos;
 

@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.validator.constraints.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,22 +16,28 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import com.miup.sg.productos.product_service.models.common.dto.response.CustomResponse;
+import com.miup.sg.productos.product_service.models.productos.Desperdicio;
 import com.miup.sg.productos.product_service.models.productos.Product;
+import com.miup.sg.productos.product_service.models.productos.Promocion;
 import com.miup.sg.productos.product_service.models.productos.Stock;
 import com.miup.sg.productos.product_service.models.productos.dto.request.ProductCreateRequest;
 import com.miup.sg.productos.product_service.models.productos.dto.request.ProductUpdateRequest;
 import com.miup.sg.productos.product_service.models.productos.dto.response.ProductResponse;
+import com.miup.sg.productos.product_service.models.productos.entity.DesperdicioEntity;
 import com.miup.sg.productos.product_service.models.productos.entity.MovimientoStock;
+import com.miup.sg.productos.product_service.models.productos.entity.PromocionEntity;
 import com.miup.sg.productos.product_service.models.productos.entity.StockEntity;
 import com.miup.sg.productos.product_service.models.productos.entity.VentaEntity;
 import com.miup.sg.productos.product_service.models.productos.mapper.ProductToProductResponseMapper;
 import com.miup.sg.productos.product_service.services.ProductCreateService;
 import com.miup.sg.productos.product_service.services.ProductDeleteService;
+import com.miup.sg.productos.product_service.services.ProductDesperdicioService;
 import com.miup.sg.productos.product_service.services.ProductMovimientoService;
 import com.miup.sg.productos.product_service.services.ProductReadService;
 import com.miup.sg.productos.product_service.services.ProductStockService;
 import com.miup.sg.productos.product_service.services.ProductUpdateService;
 import com.miup.sg.productos.product_service.services.ProductVentaService;
+import com.miup.sg.productos.product_service.services.ProductPromocionService;
 
 @RestController
 @RequestMapping("/v1/productos")
@@ -58,6 +65,12 @@ public class ProductController {
 
     @Autowired
     private ProductMovimientoService productMovService;
+
+    @Autowired
+    private ProductDesperdicioService productDesperdicioService;
+
+    @Autowired
+    private ProductPromocionService productPromocionService;
 
     private final ProductToProductResponseMapper productToProductResponseMapper = ProductToProductResponseMapper.initialize();
 
@@ -112,32 +125,89 @@ public class ProductController {
     }
 
     @PostMapping("/{productoId}/stock")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<?> registerStock(@PathVariable String productoId, @RequestBody Stock stock) {
-        StockEntity nuevoStock = productStockService.RegisterStock(productoId, stock.getCantidad(), stock.getPrecioIngreso());
+        StockEntity nuevoStock = productStockService.RegisterStock(productoId, stock.getCantidad(), stock.getPrecioIngreso(), stock.getPrecioVenta());
         return ResponseEntity.ok(nuevoStock);
     }
 
     // Obtener stock por producto
     @GetMapping("/{productoId}/stock")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
     public ResponseEntity<?> stockByProduct(@PathVariable String productoId) {
         StockEntity stock = productStockService.StockByProduct(productoId);
         return ResponseEntity.ok(stock);
     }
 
+    @GetMapping("/lista/stock")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
+    public ResponseEntity<List<StockEntity>> obtenerTodoElStock() {
+        List<StockEntity> stock = productStockService.obtenerStock(); 
+        return ResponseEntity.ok(stock); 
+    }
+
+
     // Registrar una venta
     @PostMapping("/venta")
-    public ResponseEntity<VentaEntity> registrarVenta(@RequestParam String productoId,
-                                                @RequestParam Double cantidadVendida,
-                                                @RequestParam Double precioVenta) {
-        VentaEntity venta = productVentaService.registrarVenta(productoId, cantidadVendida, precioVenta);
-        return ResponseEntity.ok(venta);
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
+    public ResponseEntity<List<VentaEntity>> registrarVenta(@RequestBody Map<String, Double> productosYCantidades) {
+        List<VentaEntity> ventas = productVentaService.registrarVenta(productosYCantidades);
+        return ResponseEntity.ok(ventas);
     }
 
     // Obtener el historial de movimientos de un producto
     @GetMapping("/{productoId}/movimientos")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<List<MovimientoStock>> obtenerHistorialMovimientos(@PathVariable String productoId) {
         List<MovimientoStock> movimientos = productMovService.obtenerHistorialMovimientos(productoId);
         return ResponseEntity.ok(movimientos);
     }
+
+    @PostMapping("/{productoId}/desperdicios")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
+    public ResponseEntity<DesperdicioEntity> registrarDesperdicio(
+            @PathVariable String productoId,
+            @RequestBody Desperdicio desperdicio) {
+        DesperdicioEntity nuevoDesperdicio = productDesperdicioService.registrarDesperdicio(productoId, desperdicio.getCantidad());
+        return ResponseEntity.ok(nuevoDesperdicio);
+    }
+
+    @GetMapping("/{productoId}/desperdicios")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
+    public ResponseEntity<List<DesperdicioEntity>> obtenerHistorialDesperdicios(@PathVariable String productoId) {
+        List<DesperdicioEntity> desperdicios = productDesperdicioService.obtenerHistorialDesperdicios(productoId);
+        return ResponseEntity.ok(desperdicios);
+    }
+
+    // Obtener todas las promociones
+    @GetMapping("/promociones/lista")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
+    public ResponseEntity<List<PromocionEntity>> obtenerTodasLasPromociones() {
+        List<PromocionEntity> promociones = productPromocionService.obtenerTodasLasPromociones();
+        return ResponseEntity.ok(promociones);
+    }
+
+    // Crear una nueva promoción
+    @PostMapping("/promociones/create")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    public ResponseEntity<PromocionEntity> crearPromocion(@RequestBody Promocion promocion) {
+        PromocionEntity nuevaPromocion = productPromocionService.crearPromocion(promocion.getNombre(),
+                                                                                promocion.getTipo(),
+                                                                                promocion.getValor(),
+                                                                                promocion.getCantidadBonificada(),
+                                                                                promocion.getCantidadRequerida(),
+                                                                                promocion.getFechaFin(),
+                                                                                promocion.getProducto());
+        return ResponseEntity.ok(nuevaPromocion);
+    }
+
+    // Activar/Desactivar una promoción
+    @PatchMapping("/promociones/{id}/estado")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    public ResponseEntity<PromocionEntity> cambiarEstadoPromocion(@PathVariable Long id, @RequestParam Boolean activa) {
+        PromocionEntity promocion = productPromocionService.cambiarEstadoPromocion(id, activa);
+        return ResponseEntity.ok(promocion);
+    }
+
 }
 

@@ -10,7 +10,4 @@ public interface StockRepository extends CrudRepository<StockEntity, Long> {
 
     StockEntity findByProductoId(String productoId);
 
-
-
-
 }

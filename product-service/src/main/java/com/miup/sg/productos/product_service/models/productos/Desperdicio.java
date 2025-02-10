@@ -1,5 +1,7 @@
 package com.miup.sg.productos.product_service.models.productos;
 
+import java.time.LocalDateTime;
+
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -8,13 +10,11 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Stock {
-    
-    private Double cantidad;
-    
-    private Double precioIngreso;
+public class Desperdicio {
 
-    private Double precioVenta;
+    private String id;
+    private Double cantidad; 
+    private LocalDateTime fechaDesperdicio;
 
 
 }

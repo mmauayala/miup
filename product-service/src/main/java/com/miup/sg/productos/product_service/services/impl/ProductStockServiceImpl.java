@@ -1,6 +1,7 @@
 package com.miup.sg.productos.product_service.services.impl;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,20 +29,20 @@ public class ProductStockServiceImpl implements ProductStockService {
 
     @Override
     @Transactional(readOnly = false)
-    public StockEntity RegisterStock(String productoId, Double cantidad, Double precioIngreso) {
+    public StockEntity RegisterStock(String productoId, Double cantidad, Double precioIngreso, Double precioVenta) {
         final ProductEntity productEntityFromDB = productRepository
                 .findById(productoId)
                 .orElseThrow(() -> new ProductNotFoundException("With given productID = " + productoId));
 
     StockEntity stockExistente = stockRepository.findByProductoId(productoId);
 
-    // Si ya existe stock, sumar la cantidad
     if (stockExistente != null) {
-        stockExistente.setCantidad(stockExistente.getCantidad() + cantidad); // Sumar la cantidad
-        stockExistente.setPrecioIngreso(stockExistente.getPrecioIngreso()); // Actualizar el precio de compra
-        stockExistente.setFechaIngreso(LocalDateTime.now()); // Actualizar la fecha de ingreso
+        stockExistente.setCantidad(stockExistente.getCantidad() + cantidad); 
+        stockExistente.setPrecioIngreso(precioIngreso); 
+        stockExistente.setPrecioVenta(precioVenta); 
+        stockExistente.setFechaIngreso(LocalDateTime.now());
         
-        productMovService.registrarMovimientoStock(stockExistente, cantidad, precioIngreso, "INGRESO");
+        productMovService.registrarMovimientoStock(stockExistente, cantidad, "INGRESO");
 
         return stockRepository.save(stockExistente);
     
@@ -50,9 +51,10 @@ public class ProductStockServiceImpl implements ProductStockService {
         stock.setProducto(productEntityFromDB);
         stock.setCantidad(cantidad);
         stock.setPrecioIngreso(precioIngreso);
+        stock.setPrecioVenta(precioVenta); 
         stock.setFechaIngreso(LocalDateTime.now());
         
-        productMovService.registrarMovimientoStock(stock, cantidad, precioIngreso, "INGRESO");
+        productMovService.registrarMovimientoStock(stock, cantidad, "INGRESO");
         
         return stockRepository.save(stock);
 
@@ -65,5 +67,12 @@ public class ProductStockServiceImpl implements ProductStockService {
     public StockEntity StockByProduct(String productoId) {
         
         return stockRepository.findByProductoId(productoId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<StockEntity> obtenerStock() {
+
+        return (List<StockEntity>) stockRepository.findAll();
     }
 }

@@ -7,7 +7,7 @@ import com.miup.sg.productos.product_service.models.productos.entity.StockEntity
 
 public interface ProductMovimientoService {
 
-    MovimientoStock registrarMovimientoStock(StockEntity stock, Double cantidad, Double precioCompra, String tipo);
+    MovimientoStock registrarMovimientoStock(StockEntity stock, Double cantidad, String tipo);
 
     List<MovimientoStock> obtenerHistorialMovimientos(String productoId);
 }
