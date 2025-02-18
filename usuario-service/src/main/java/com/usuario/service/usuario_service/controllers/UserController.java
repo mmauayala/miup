@@ -1,10 +1,14 @@
 package com.usuario.service.usuario_service.controllers;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,8 +22,14 @@ import com.usuario.service.usuario_service.model.user.dto.request.RegisterReques
 import com.usuario.service.usuario_service.model.user.dto.request.TokenInvalidateRequest;
 import com.usuario.service.usuario_service.model.user.dto.request.TokenRefreshRequest;
 import com.usuario.service.usuario_service.model.user.dto.response.TokenResponse;
+import com.usuario.service.usuario_service.model.user.dto.response.UserResponse;
 import com.usuario.service.usuario_service.model.user.mapper.TokenToTokenResponseMapper;
-import com.usuario.service.usuario_service.services.impl.*;
+import com.usuario.service.usuario_service.services.UserQueryService;
+import com.usuario.service.usuario_service.services.impl.LogoutServiceImpl;
+import com.usuario.service.usuario_service.services.impl.RefreshTokenServiceImpl;
+import com.usuario.service.usuario_service.services.impl.RegisterServiceImpl;
+import com.usuario.service.usuario_service.services.impl.TokenServiceImpl;
+import com.usuario.service.usuario_service.services.impl.UserLoginServiceImpl;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +55,9 @@ public class UserController {
 
     @Autowired
     private TokenServiceImpl tokenService;
+
+    @Autowired
+    private UserQueryService userQueryService;
 
     private final TokenToTokenResponseMapper tokenToTokenResponseMapper = TokenToTokenResponseMapper.initialize();
 
@@ -91,4 +104,25 @@ public class UserController {
         return ResponseEntity.ok(authentication);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponse> getUserById(@PathVariable String id) {
+        log.info("UserController | getUserById");
+        Optional<UserResponse> user = userQueryService.getUserById(id);
+        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping
+    public ResponseEntity<List<UserResponse>> getAllUsers() {
+        log.info("UserController | getAllUsers");
+        List<UserResponse> users = userQueryService.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
+
+    // Endpoint para obtener la información del usuario actual
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> getCurrentUser(@RequestParam String token) {
+        log.info("UserController | getCurrentUser");
+        UserResponse userResponse = userQueryService.getCurrentUser(token);
+        return ResponseEntity.ok(userResponse);
+    }
 }

@@ -6,20 +6,37 @@ spring:
     name: api-gateway
   config:
     import: optional:configserver:http://localhost:8888
+  main:
+    web-application-type: reactive
   cloud:
     gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:5173"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            allowedHeaders: "*"
       discovery:
         locator:
-          enabled: false
+          enabled: true
+          lower-case-service-id: true
       routes:
         - id: usuario-service
           uri: lb://usuario-service
           predicates:
-            - Path=/**
+            - Path=/v1/usuarios/**
         - id: product-service
           uri: lb://product-service
           predicates:
-            - Path=/**
+            - Path=/v1/productos/**
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/v1/autenticacion/**
           
 
     
