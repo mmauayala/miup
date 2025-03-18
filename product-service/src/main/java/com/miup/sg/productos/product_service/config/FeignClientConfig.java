@@ -107,6 +107,8 @@ public class FeignClientConfig {
             }
                 return new FeignException.BadRequest("Bad Request", response.request(), response.request().body(), response.headers());
 
+        
         }
     }
+    
 }

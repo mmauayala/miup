@@ -104,10 +104,17 @@ public class UserController {
         return ResponseEntity.ok(authentication);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable String id) {
         log.info("UserController | getUserById");
         Optional<UserResponse> user = userQueryService.getUserById(id);
+        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{username}")
+    public ResponseEntity<UserResponse> getUserByUsername(@PathVariable String username) {
+        log.info("UserController | getUserByUsername");
+        Optional<UserResponse> user = userQueryService.getUserByUsername(username);
         return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 

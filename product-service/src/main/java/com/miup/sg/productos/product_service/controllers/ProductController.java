@@ -23,6 +23,7 @@ import com.miup.sg.productos.product_service.models.productos.Stock;
 import com.miup.sg.productos.product_service.models.productos.dto.request.ProductCreateRequest;
 import com.miup.sg.productos.product_service.models.productos.dto.request.ProductUpdateRequest;
 import com.miup.sg.productos.product_service.models.productos.dto.response.ProductResponse;
+import com.miup.sg.productos.product_service.models.productos.dto.response.ProductoIdResponse;
 import com.miup.sg.productos.product_service.models.productos.entity.DesperdicioEntity;
 import com.miup.sg.productos.product_service.models.productos.entity.MovimientoStock;
 import com.miup.sg.productos.product_service.models.productos.entity.PromocionEntity;
@@ -91,6 +92,13 @@ public class ProductController {
         return productReadService.findAll(pageable);
     }
 
+    @GetMapping("/obtener-id/{name}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
+    public ResponseEntity<ProductoIdResponse> getProductIdByName(@PathVariable String name) {
+        ProductoIdResponse response = productReadService.getProductIdByName(name);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/{productId}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
     public CustomResponse<ProductResponse> getProductById(@PathVariable @UUID final String productId) {
@@ -102,6 +110,7 @@ public class ProductController {
         return CustomResponse.successOf(productResponse);
 
     }
+    
 
     @PutMapping("/{productId}")
     @PreAuthorize("hasAnyAuthority('ADMIN')")
@@ -161,6 +170,11 @@ public class ProductController {
     public ResponseEntity<List<MovimientoStock>> obtenerHistorialMovimientos(@PathVariable String productoId) {
         List<MovimientoStock> movimientos = productMovService.obtenerHistorialMovimientos(productoId);
         return ResponseEntity.ok(movimientos);
+    }
+
+    @GetMapping("/movimientos")
+    public List<MovimientoStock> obtenerTodosLosMovimientos() {
+        return productMovService.obtenerTodosLosMovimientos();
     }
 
     @PostMapping("/{productoId}/desperdicios")

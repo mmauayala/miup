@@ -10,4 +10,6 @@ public interface ProductMovimientoService {
     MovimientoStock registrarMovimientoStock(StockEntity stock, Double cantidad, String tipo);
 
     List<MovimientoStock> obtenerHistorialMovimientos(String productoId);
+
+    List<MovimientoStock> obtenerTodosLosMovimientos();
 }

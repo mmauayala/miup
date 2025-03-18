@@ -60,7 +60,14 @@ public class UserQueryServiceImpl implements UserQueryService {
         UserResponse userResponse = new UserResponse();
         userResponse.setId(userEntity.getId());
         userResponse.setUsername(userEntity.getUsername());
+        userResponse.setUserType(userEntity.getUserType());
         return userResponse;
+    }
+
+    @Override
+    public Optional<UserResponse> getUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .map(this::mapToUserResponse);
     }
 
     

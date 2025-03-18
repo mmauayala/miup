@@ -11,7 +11,7 @@ import com.miup.sg.productos.product_service.models.productos.entity.ProductEnti
 @Mapper
 public interface ProductUpdateRequestToProductEntityMapper extends BaseMapper<ProductUpdateRequest, ProductEntity> {
 
-
+    
     @Named("mapForUpdating")
     default void mapForUpdating(ProductEntity productEntityToBeUpdate, ProductUpdateRequest productUpdateRequest) {
         productEntityToBeUpdate.setName(productUpdateRequest.getName());

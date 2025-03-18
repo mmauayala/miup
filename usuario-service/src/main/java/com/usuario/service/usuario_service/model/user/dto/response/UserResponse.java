@@ -1,5 +1,7 @@
 package com.usuario.service.usuario_service.model.user.dto.response;
 
+import com.usuario.service.usuario_service.model.user.enums.UserType;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,5 +17,6 @@ public class UserResponse {
 
     private String id;
     private String username;
+    private UserType userType;
 
 } 

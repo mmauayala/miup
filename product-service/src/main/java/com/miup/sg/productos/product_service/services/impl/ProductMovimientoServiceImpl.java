@@ -40,6 +40,10 @@ public class ProductMovimientoServiceImpl implements ProductMovimientoService {
         return movimientoStockRepository.findByStockId(stock.getId());
     }
 
+    @Override
+    public List<MovimientoStock> obtenerTodosLosMovimientos() {
+        return (List<MovimientoStock>) movimientoStockRepository.findAll();
+    }
 }
 
     

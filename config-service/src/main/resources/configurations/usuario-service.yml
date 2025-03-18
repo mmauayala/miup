@@ -6,7 +6,7 @@ spring:
     name: usuario-service
   
   datasource:
-    url: jdbc:mysql://localhost:3306/miup_bd
+    url: jdbc:mysql://localhost:3306/miup_bd?useSSL=false&serverTimezone=UTC
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: Frank800
@@ -14,10 +14,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    database: mysql
+    database-platform: org.hibernate.dialect.MySQLDialect
     properties:
       hibernate:
-        database-platform: org.hibernate.dialect.MySQLDialect
+        format_sql: true
     show-sql: true
 
 ## CONFIGURACION EUREKA SERVICE --------------

@@ -8,6 +8,8 @@ import com.usuario.service.usuario_service.model.user.dto.response.UserResponse;
 public interface UserQueryService {
 
     Optional<UserResponse> getUserById(String id);
+
+    Optional<UserResponse> getUserByUsername(String username);
     
     List<UserResponse> getAllUsers();
 

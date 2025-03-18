@@ -1,7 +1,5 @@
 package com.usuario.service.usuario_service.services.impl;
 
-import lombok.RequiredArgsConstructor;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,6 +12,8 @@ import com.usuario.service.usuario_service.model.user.entities.UserEntity;
 import com.usuario.service.usuario_service.repositories.UserRepository;
 import com.usuario.service.usuario_service.services.TokenService;
 import com.usuario.service.usuario_service.services.UserLoginService;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +34,7 @@ public class UserLoginServiceImpl implements UserLoginService {
         final UserEntity userEntityFromDB = userRepository
                 .findByUsername(loginRequest.getUsername())
                 .orElseThrow(
-                        () -> new UserNotFoundException("Can't find with given email: "
+                        () -> new UserNotFoundException("Can't find with given username: "
                                 + loginRequest.getUsername())
                 );
 

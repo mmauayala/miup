@@ -11,6 +11,7 @@ import com.miup.sg.productos.product_service.models.productos.entity.ProductEnti
 @Mapper
 public interface ProductCreateRequestToProductEntityMapper extends BaseMapper<ProductCreateRequest, ProductEntity> {
 
+    
     @Named("mapForSaving")
     default ProductEntity mapForSaving(ProductCreateRequest productCreateRequest) {
         return ProductEntity.builder()

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.miup.sg.productos.product_service.exception.ProductNotFoundException;
 import com.miup.sg.productos.product_service.models.productos.Product;
+import com.miup.sg.productos.product_service.models.productos.dto.response.ProductoIdResponse;
 import com.miup.sg.productos.product_service.models.productos.entity.ProductEntity;
 import com.miup.sg.productos.product_service.models.productos.mapper.ProductEntityToProductMapper;
 import com.miup.sg.productos.product_service.repositories.ProductRepository;
@@ -38,5 +39,12 @@ public class ProductReadServiceImpl implements ProductReadService {
         return productRepository.findAll(pageable);
     }
 
+    @Override
+    public ProductoIdResponse getProductIdByName(String productName) {
+        ProductEntity productEntity = productRepository.findByName(productName)
+                .orElseThrow(() -> new ProductNotFoundException("Product with name = " + productName + " not found"));
+    
+        return new ProductoIdResponse(productEntity.getId()); // Devuelve el DTO
+    }
 
 }

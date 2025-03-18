@@ -7,10 +7,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductResponse {
+public class ProductoIdResponse {
 
     private String id;
-    private String name;
-    private String medida;
-
 }
