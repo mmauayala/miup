@@ -5,10 +5,13 @@ spring:
   application:
     name: product-service
   datasource:
+    #url: jdbc:mysql://localhost:3306/miup_bd?useSSL=false&serverTimezone=UTC
+    #username: root
+    #password: Frank800
+    url: jdbc:mysql://miup-sistema-gestion.cvuqusmy082l.us-east-2.rds.amazonaws.com:3306/miup_bd?useSSL=false&serverTimezone=UTC
+    username: admin
+    password: Frank888RGMiupSG
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/miup_bd
-    username: root
-    password: Frank800
 
   jpa:
     hibernate:
@@ -22,9 +25,6 @@ spring:
     show-sql: true
 
 eureka:
-  enabled: true
-  instance: 
-    hostname: localhost
   client: 
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://eureka-service:8761/eureka

@@ -9,9 +9,9 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootApplication
 @EnableDiscoveryClient
 public class UsuarioServiceApplication {
-
+	
 	public static void main(String[] args) {
-		SpringApplication.run(UsuarioServiceApplication.class, args);
+    SpringApplication.run(UsuarioServiceApplication.class, args);
 	}
 	
 	@Bean

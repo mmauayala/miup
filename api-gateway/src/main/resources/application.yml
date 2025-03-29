@@ -1,6 +1,6 @@
 server:
   port: 9191
-  
+
 spring:
   application:
     name: api-gateway
@@ -13,7 +13,9 @@ spring:
       globalcors:
         cors-configurations:
           '[/**]':
-            allowedOrigins: "http://localhost:5173"
+            allowedOrigins: 
+            - "https://main.ddg3tufmfel6v.amplifyapp.com/"
+            #- "http://localhost:5173/"
             allowedMethods:
               - GET
               - POST
@@ -42,8 +44,6 @@ spring:
     
 ## CONFIGURACION EUREKA SERVICE --------------
 eureka:
-  client:
+  client: 
     service-url:
-      defaultZone: http://localhost:8761/eureka/
-  instance:
-    hostname: localhost
+      defaultZone: http://eureka-service:8761/eureka
