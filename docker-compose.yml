@@ -1,5 +1,4 @@
 services:
-  # Eureka service (Service Discovery)
   eureka-service:
     image: eureka-service
     build:
@@ -14,7 +13,6 @@ services:
     networks:
       - app-network
 
-  # Config service (si no tienes uno dockerizado, usaremos un servicio de ejemplo)
   config-service:
     image: config-service
     build:
@@ -22,7 +20,7 @@ services:
       dockerfile: Dockerfile
     container_name: config-service
     volumes:
-      - ./config-service/configurations:/configurations # Monta los archivos en el contenedor
+      - ./config-service/configurations:/configurations 
     environment:
       - SPRING_PROFILES_ACTIVE=native
     ports:
@@ -30,22 +28,22 @@ services:
     networks:
       - app-network
 
-  # Microservicios (reemplaza con el nombre de tus servicios)
+
   usuario-service:
     image: usuario-service
     build:
-      context: ./usuario-service  # Ruta a tu microservicio 1
+      context: ./usuario-service  
       dockerfile: Dockerfile
     container_name: usuario-service
     environment:
       - SPRING_PROFILES_ACTIVE=native
-      - SPRING_DATASOURCE_URL=jdbc:mysql://miup-sistema-gestion.cvuqusmy082l.us-east-2.rds.amazonaws.com:3306/miup_bd
-      - SPRING_DATASOURCE_USERNAME=admin
-      - SPRING_DATASOURCE_PASSWORD=Frank888RGMiupSG
+      - SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/miup_bd
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=1234
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://eureka-service:8761/eureka
     ports:
-      - "8090:8090"  # Ajusta el puerto según sea necesario
+      - "8090:8090"  
     depends_on:
       - eureka-service
       - config-service
@@ -55,18 +53,18 @@ services:
   product-service:
     image: product-service
     build:
-      context: ./product-service  # Ruta a tu microservicio 2
+      context: ./product-service  
       dockerfile: Dockerfile
     container_name: product-service
     environment:
       - SPRING_PROFILES_ACTIVE=native
-      - SPRING_DATASOURCE_URL=jdbc:mysql://miup-sistema-gestion.cvuqusmy082l.us-east-2.rds.amazonaws.com:3306/miup_bd
-      - SPRING_DATASOURCE_USERNAME=admin
-      - SPRING_DATASOURCE_PASSWORD=Frank888RGMiupSG
+      - SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/miup_bd
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=1234
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://eureka-service:8761/eureka
     ports:
-      - "8092:8092"  # Ajusta el puerto según sea necesario
+      - "8092:8092"  
     depends_on:
       - eureka-service
       - config-service
@@ -76,14 +74,14 @@ services:
   auth-service:
     image: auth-service
     build:
-      context: ./auth-service  # Ruta a tu microservicio 3
+      context: ./auth-service 
       dockerfile: Dockerfile
     container_name: auth-service
     environment:
       - SPRING_PROFILES_ACTIVE=native
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://eureka-service:8761/eureka
     ports:
-      - "8089:8089"  # Ajusta el puerto según sea necesario
+      - "8089:8089"  
     depends_on:
       - eureka-service
       - config-service
@@ -91,14 +89,10 @@ services:
     networks:
       - app-network
 
-  # Agrega aquí los otros microservicios de manera similar (microservice3, microservice4, microservice5)
-
-
-  # API Gateway (si es un microservicio independiente)
   api-gateway:
     image: api-gateway
     build:
-      context: ./api-gateway  # Ruta a tu API Gateway
+      context: ./api-gateway  
     container_name: api-gateway
     environment:
       - SPRING_PROFILES_ACTIVE=native
